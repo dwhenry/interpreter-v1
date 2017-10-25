@@ -2,7 +2,7 @@
 #define _SCAN_H_
 
 #include "globals.h"
-#include "config.h"
+#include "source_file.h"
 
 #define TOKENS_MAPS 19
 #define RESERVED_MAPS 6
@@ -19,7 +19,6 @@ class Scan {
   void consumeWhile(char tokenString[], checkFunction func);
 
 public:
-  Scan(Config * config);
   Scan(std::string command);
   TokenDetails * next();
 };

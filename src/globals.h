@@ -19,7 +19,7 @@ namespace TokenType {
 }
 
 typedef struct tokenDetails {
-  TokenType::TOKENS token;
+  TokenType::TOKENS type;
   std::string str;
   int lineNumber;
   int startPosition;

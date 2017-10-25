@@ -102,7 +102,7 @@ TokenDetails * Scan::next() {
 
   // consume comments and spacing
   if(!consumeIgnorables()) {
-    token->token = TokenType::ENDFILE;
+    token->type = TokenType::ENDFILE;
     return token;
   }
 
@@ -115,10 +115,10 @@ TokenDetails * Scan::next() {
 
   if(isdigit(c)) {
     consumeWhile(tokenString, &isdigit);
-    token->token = TokenType::NUM;
+    token->type = TokenType::NUM;
   } else if (isalpha(c)) {
     consumeWhile(tokenString, &isalpha);
-    token->token = lookup((std::string)tokenString);
+    token->type = lookup((std::string)tokenString);
   } else {
     int p = this->sourceFile->previewChar();
     for(int i=0; i < TOKENS_MAPS; i++) {
@@ -126,11 +126,11 @@ TokenDetails * Scan::next() {
         tokenString[1] = tokenMap[i].preview;
         tokenString[2] = '\0';
         if(tokenString[1] != '\0') this->sourceFile->nextChar();
-        token->token = tokenMap[i].token;
+        token->type = tokenMap[i].token;
         break;
       }
     }
-    if(!token->token) {
+    if(!token->type) {
       tokenString[1] = '\0';
       std::cout << (std::string)tokenString;
       throw "Parse error, invalid character"; //.append((char*)c).append(" at "); // + token->lineNumber + ":" + token->position;
