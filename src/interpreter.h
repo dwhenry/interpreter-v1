@@ -7,9 +7,14 @@
 #include <string>
 
 class Interpreter {
+  Scan * scanner;
+  TokenDetails * nextToken;
+  int exp();
+  int term();
+  int factor(TokenType::TOKENS expectedType);
 
 public:
-  Interpreter() {};
+  Interpreter() {}
   virtual std::string process(std::string command);
 };
 

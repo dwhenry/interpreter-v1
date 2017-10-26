@@ -9,12 +9,11 @@ SourceFile::SourceFile(std::string command) {
 };
 
 int SourceFile::nextChar() {
-  if(this->position > this->currentLine.size()) {
+  if(this->position >= this->currentLine.size()) {
+    // std::cout << "EOF reached" << std::endl;
     return EOF;
-    // }
-    // this->lineNumber++;
-    // this->position = 0;
   }
+  // std::cout << "char at: " << this->position << " of: " << this->currentLine.size() << " is: " << this->currentLine[this->position] << std::endl;
   return this->currentLine[this->position++];
 };
 

@@ -13,7 +13,7 @@ int main( int argc, char * argv[] ) {
       if(command == "exit") return 0;
       std::cout << interpreter->process(command) << "\n";
     } catch(std::string e) {
-      std::cout << "An error occurred: " << e << std::endl;;
+      std::cout << "An error occurred: " << e << std::endl;
     } catch(char const* e) {
       std::cout << "An error occurred: " << e << std::endl;
     }

@@ -2,7 +2,7 @@ cc = gcc
 
 CFLAGS = -std=c++11
 
-all: app
+all: main app_test
 
 scan.o: src/scan.h src/scan.cc src/globals.h src/source_file.h
 	g++ $(CFLAGS) -g -c src/scan.cc src/globals.h
@@ -10,22 +10,24 @@ scan.o: src/scan.h src/scan.cc src/globals.h src/source_file.h
 source_file.o: src/source_file.cc src/globals.h
 	g++ $(CFLAGS) -g -c src/source_file.cc
 
-interpreter.o: src/main.cc src/interpreter.cc src/scan.cc src/source_file.cc
+interpreter.o: src/interpreter.cc src/scan.cc src/source_file.cc src/globals.h
 	g++ $(CFLAGS) -g -c src/interpreter.cc
 
 main.o: src/main.cc src/scan.cc src/source_file.cc
 	g++ $(CFLAGS) -g -c src/main.cc
 
-app: main.o source_file.o scan.o interpreter.o
+main: main.o source_file.o scan.o interpreter.o
 	g++ $(CFLAGS) -g -o main main.o source_file.o scan.o interpreter.o
 
+interpreter_test.o: tests/interpreter_test.cc src/interpreter.cc src/scan.cc src/source_file.cc src/globals.h
+	g++ $(CFLAGS) -g -c tests/interpreter_test.cc
 
-# test.o: tests/test.cc
-# 	g++ $(CFLAGS) -g -c tests/test.cc
+test.o: tests/test.cc
+	g++ $(CFLAGS) -g -c tests/test.cc
 
-# app_test: test.o source_file.o source_file_test.o config_test.o config.o scan_test.o scan.o tests/fakes/fake_config.h tests/fakes/fake_source_file.h
-# 	g++ $(CFLAGS) -g -o app_test test.o source_file.o source_file_test.o config_test.o config.o scan_test.o scan.o
+app_test: test.o interpreter_test.o interpreter.o scan.o source_file.o
+	g++ $(CFLAGS) -g -o app_test test.o interpreter_test.o interpreter.o scan.o source_file.o
 
 clean:
-	rm -f app_test app ./*.o
+	rm -f app_test main ./*.o
 

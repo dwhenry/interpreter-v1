@@ -1,69 +1,81 @@
 #include "interpreter.h"
 #include <sstream>
 
-void check(TokenDetails * token, TokenType::TOKENS expectedType) {
-    // std::cout << "here";
-  if(token->type != expectedType) {
-    // std::stringstream result;
-    // result << "Invalid token " << token->str << " at:" << token->lineNumber << ":" << token.startPosition;
-
-    throw "apples"; //result.str();
+int Interpreter::factor(TokenType::TOKENS expectedType) {
+  if(this->nextToken->type != expectedType) {
+    std::stringstream result;
+    result << "Invalid token " << this->nextToken->str << " at:" << this->nextToken->lineNumber << ":" << this->nextToken->startPosition;
+    throw result.str();
   }
+
+  int value;
+  std::stringstream(this->nextToken->str) >> value;
+  this->nextToken = this->scanner->next();
+  return value;
 }
 
-void checkAny(TokenDetails * token, TokenType::TOKENS allowedTypes[], int allowedTypeCount) {
-  for(int i = 0; i < allowedTypeCount; i++) {
-    if(token->type == allowedTypes[i]) {
-      return;
-    }
+int Interpreter::term() {
+  int value;
+  bool process = true;
+  std::stringstream result;
+
+  value = this->factor(TokenType::NUM);
+
+  while(process) {
+
+    switch(this->nextToken->type) {
+    case TokenType::TIMES:
+      this->nextToken = this->scanner->next();
+      value = value * this->factor(TokenType::NUM);
+      break;
+    case TokenType::DIVIDE:
+      this->nextToken = this->scanner->next();
+      value = value / this->factor(TokenType::NUM);
+      break;
+    default:
+      process = false;
+      break;
+    };
   }
 
-  // std::stringstream result;
-  // result << "Invalid token " << token->str << " at:" << token->lineNumber << ":" << token.startPosition;
+  return value;
+}
 
-  // throw result.str();
+int Interpreter::exp() {
+  int value;
+  bool process = true;
+  std::stringstream result;
+
+  this->nextToken = this->scanner->next();
+  value = this->term();
+
+  while(process) {
+    switch(this->nextToken->type) {
+    case TokenType::ENDFILE:
+      // std::cout << "EOF reached" << std::endl;
+      process = false;
+      break;
+    case TokenType::PLUS:
+      this->nextToken = this->scanner->next();
+      value = value + this->term();
+      break;
+    case TokenType::MINUS:
+      this->nextToken = this->scanner->next();
+      value = value - this->term();
+      break;
+    default:
+      result << "Invalid token " << this->nextToken->str << " at:" << this->nextToken->lineNumber << ":" << this->nextToken->startPosition;
+      throw result.str();
+    };
+  }
+
+  return value;
 }
 
 std::string Interpreter::process(std::string command) {
-  Scan * scanner = new Scan(command);
-
-  TokenDetails * left;
-  TokenDetails * action;
-  TokenDetails * right;
-
-  left = scanner->next();
-  check(left, TokenType::NUM);
-
-  action = scanner->next();
-  TokenType::TOKENS allowedActions[3];
-  allowedActions[0] = TokenType::PLUS;
-  allowedActions[1] = TokenType::MINUS;
-  allowedActions[1] = TokenType::TIMES;
-  checkAny(action, allowedActions, 3);
-
-  right = scanner->next();
-  check(right, TokenType::NUM);
-
-  int value = 0, temp;
-  std::stringstream(left->str) >> temp;
-  value = value + temp;
-  std::stringstream(right->str) >> temp;
-  switch(action->type) {
-  case TokenType::PLUS:
-    value = value + temp;
-    break;
-  case TokenType::MINUS:
-    value = value - temp;
-    break;
-  case TokenType::TIMES:
-    value = value * temp;
-    break;
-  default:
-    throw "Invalid state";
-  }
-
-
   std::stringstream result;
-  result << "Result of " << command << " is: " << value;
+
+  this->scanner = new Scan(command);
+  result << "Result of " << command << " is: " << exp();
   return result.str();
 }

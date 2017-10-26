@@ -65,6 +65,7 @@ bool Scan::consumeIgnorables() {
     if ((c == ' ') || (c == '\t') || (c == '\n')) {
       // noop
     } else if(c == EOF) {
+      // std::cout << "hit EOF";
       return false;
     } else if(c == '/' && this->sourceFile->previewChar() == '*') {
       consumeComment();
@@ -82,7 +83,8 @@ void Scan::consumeWhile(char tokenString[], checkFunction func) {
     tokenString[pos++] = c;
   }
   tokenString[pos] = '\0';
-  this->sourceFile->restoreChar();
+  if(c != EOF)
+    this->sourceFile->restoreChar();
 }
 
 TokenType::TOKENS Scan::lookup(std::string tokenString) {
@@ -100,8 +102,10 @@ TokenDetails * Scan::next() {
 
   TokenDetails * token = new TokenDetails();
 
+
   // consume comments and spacing
   if(!consumeIgnorables()) {
+    // std::cout << "EOF standard";
     token->type = TokenType::ENDFILE;
     return token;
   }
@@ -109,11 +113,10 @@ TokenDetails * Scan::next() {
   token->lineNumber = this->sourceFile->lineNumber;
   token->startPosition = this->sourceFile->position;
 
-  c = this->sourceFile->nextChar();
-
-  tokenString[0] = c;
+  tokenString[0] = c = this->sourceFile->nextChar();
 
   if(isdigit(c)) {
+    // std::cout << "number start" << c << std::endl;
     consumeWhile(tokenString, &isdigit);
     token->type = TokenType::NUM;
   } else if (isalpha(c)) {
@@ -132,8 +135,8 @@ TokenDetails * Scan::next() {
     }
     if(!token->type) {
       tokenString[1] = '\0';
-      std::cout << (std::string)tokenString;
-      throw "Parse error, invalid character"; //.append((char*)c).append(" at "); // + token->lineNumber + ":" + token->position;
+      std::cout << "Parse error on string: " << (std::string)tokenString << c << std::endl;
+      throw "Parse error, invalid character";
     }
   }
 
