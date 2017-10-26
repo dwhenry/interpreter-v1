@@ -16,6 +16,10 @@ class Interpreter {
   AST * term();
   AST * factor();
 
+  int visit(AST * node);
+  int visit(BinAST * node);
+  int visit(NumAST * node);
+
 public:
   Interpreter() {}
   virtual std::string process(std::string command);

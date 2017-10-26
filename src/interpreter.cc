@@ -116,6 +116,30 @@ std::string Interpreter::process(std::string command) {
 
   this->eat(TokenType::ENDFILE);
 
-  result << node->visit();
+  result << this->visit(node);
   return result.str();
+}
+
+int Interpreter::visit(AST * node) {
+  std::cout << "Failed" << std::endl;
+  return 0;
+}
+
+int Interpreter::visit(BinAST * node) {
+  switch(node->op) {
+  case TokenType::PLUS:
+    return this->visit(node->left) + this->visit(node->right);
+  case TokenType::MINUS:
+    return this->visit(node->left) - this->visit(node->right);
+  case TokenType::TIMES:
+    return this->visit(node->left) * this->visit(node->right);
+  case TokenType::DIVIDE:
+    return this->visit(node->left) / this->visit(node->right);
+  default:
+    throw "Umnexpected";
+  }
+}
+
+int Interpreter::visit(NumAST * node) {
+  return node->value;
 }
