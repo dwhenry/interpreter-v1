@@ -2,6 +2,7 @@
 #define _INTERGPRETER_H_
 
 #include "globals.h"
+#include "ast.h"
 #include "scan.h"
 #include <iostream>
 #include <string>
@@ -11,9 +12,9 @@ class Interpreter {
   TokenDetails * nextToken;
   void eat(TokenType::TOKENS tokenType);
   void error(std::string msg);
-  int exp();
-  int term();
-  int factor();
+  AST * exp();
+  AST * term();
+  AST * factor();
 
 public:
   Interpreter() {}

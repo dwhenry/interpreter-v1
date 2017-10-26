@@ -10,7 +10,7 @@ scan.o: src/scan.h src/scan.cc src/globals.h src/source_file.h
 source_file.o: src/source_file.cc src/globals.h
 	g++ $(CFLAGS) -g -c src/source_file.cc
 
-interpreter.o: src/interpreter.cc src/scan.cc src/source_file.cc src/globals.h
+interpreter.o: src/interpreter.cc src/scan.cc src/source_file.cc src/globals.h src/ast.h
 	g++ $(CFLAGS) -g -c src/interpreter.cc
 
 main.o: src/main.cc src/scan.cc src/source_file.cc
@@ -19,7 +19,7 @@ main.o: src/main.cc src/scan.cc src/source_file.cc
 main: main.o source_file.o scan.o interpreter.o
 	g++ $(CFLAGS) -g -o main main.o source_file.o scan.o interpreter.o
 
-interpreter_test.o: tests/interpreter_test.cc src/interpreter.cc src/scan.cc src/source_file.cc src/globals.h
+interpreter_test.o: tests/interpreter_test.cc src/interpreter.cc src/scan.cc src/source_file.cc src/globals.h src/ast.h
 	g++ $(CFLAGS) -g -c tests/interpreter_test.cc
 
 test.o: tests/test.cc

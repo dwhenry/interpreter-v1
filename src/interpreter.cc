@@ -1,22 +1,23 @@
 #include "interpreter.h"
 #include <sstream>
 
-int Interpreter::factor() {
-  int value;
+AST * Interpreter::factor() {
+  AST * node;
 
   switch(this->nextToken->type) {
   case TokenType::NUM:
+    int value;
     std::stringstream(this->nextToken->str) >> value;
     this->eat(TokenType::NUM);
-    return value;
+    return new NumAST(value);
   case TokenType::L_BR:
     this->eat(TokenType::L_BR);
-    value = this->exp();
+    node = this->exp();
     this->eat(TokenType::R_BR);
-    return value;
+    return node;
   default:
     this->error("Invalid token: ");
-    return 0;
+    return NULL;
   }
 }
 
@@ -50,23 +51,23 @@ void Interpreter::error(std::string msg) {
   throw result.str();
 }
 
-int Interpreter::term() {
-  int value;
+AST * Interpreter::term() {
+  AST * node;
   bool process = true;
   std::stringstream result;
 
-  value = this->factor();
+  node = this->factor();
 
   while(process) {
 
     switch(this->nextToken->type) {
     case TokenType::TIMES:
       this->eat(TokenType::TIMES);
-      value = value * this->factor();
+      node = new BinAST(node, TokenType::TIMES, this->factor());
       break;
     case TokenType::DIVIDE:
       this->eat(TokenType::DIVIDE);
-      value = value / this->factor();
+      node = new BinAST(node, TokenType::DIVIDE, this->factor());
       break;
     default:
       process = false;
@@ -74,25 +75,25 @@ int Interpreter::term() {
     };
   }
 
-  return value;
+  return node;
 }
 
-int Interpreter::exp() {
-  int value;
+AST * Interpreter::exp() {
+  AST * node;
   bool process = true;
   std::stringstream result;
 
-  value = this->term();
+  node = this->term();
 
   while(process) {
     switch(this->nextToken->type) {
     case TokenType::PLUS:
       this->eat(TokenType::PLUS);
-      value = value + this->term();
+      node = new BinAST(node, TokenType::PLUS, this->term());
       break;
     case TokenType::MINUS:
       this->eat(TokenType::MINUS);
-      value = value - this->term();
+      node = new BinAST(node, TokenType::MINUS, this->term());
       break;
     default:
       process = false;
@@ -100,7 +101,7 @@ int Interpreter::exp() {
     };
   }
 
-  return value;
+  return node;
 }
 
 
@@ -109,12 +110,12 @@ std::string Interpreter::process(std::string command) {
 
   this->scanner = new Scan(command);
   this->nextToken = this->scanner->next();
-  int value;
+  AST * node;
 
-  value = this->exp();
+  node = this->exp();
 
   this->eat(TokenType::ENDFILE);
 
-  result << value;
+  result << node->visit();
   return result.str();
 }
