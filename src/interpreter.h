@@ -9,9 +9,11 @@
 class Interpreter {
   Scan * scanner;
   TokenDetails * nextToken;
+  void eat(TokenType::TOKENS tokenType);
+  void error(std::string msg);
   int exp();
   int term();
-  int factor(TokenType::TOKENS expectedType);
+  int factor();
 
 public:
   Interpreter() {}

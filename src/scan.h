@@ -4,7 +4,6 @@
 #include "globals.h"
 #include "source_file.h"
 
-#define TOKENS_MAPS 19
 #define RESERVED_MAPS 6
 
 typedef int (*checkFunction)(int);

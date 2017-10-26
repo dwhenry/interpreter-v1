@@ -3,35 +3,6 @@
 
 static struct
   {
-    int current;
-    int preview;
-    TokenType::TOKENS token;
-  } tokenMap[TOKENS_MAPS]
-  = {
-      {'+', '\0', TokenType::PLUS},
-      {'-', '\0', TokenType::MINUS},
-      {'*', '\0', TokenType::TIMES},
-      {'/', '\0', TokenType::DIVIDE},
-      {'<', '=', TokenType::LTEQ},
-      {'<', '\0', TokenType::LT},
-      {'>', '=',TokenType::GTEQ},
-      {'>', '\0', TokenType::GT},
-      {'=', '=', TokenType::EQ},
-      {'=', '\0', TokenType::ASSIGN},
-      {'!', '=', TokenType::NOTEQ},
-      {';', '\0', TokenType::SEMI},
-      {',', '\0', TokenType::COMMA},
-
-      {'(', '\0', TokenType::L_BR},
-      {')', '\0', TokenType::R_BR},
-      {'[', '\0', TokenType::L_SQUARE_BR},
-      {']', '\0', TokenType::R_SQUARE_BR},
-      {'{', '\0', TokenType::L_SQUIGGLE_BR},
-      {'}', '\0', TokenType::R_SQUIGGLE_BR}
-    };
-
-static struct
-  {
     std::string str;
     TokenType::TOKENS token;
   } reservedMap[RESERVED_MAPS]

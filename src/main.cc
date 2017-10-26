@@ -11,7 +11,7 @@ int main( int argc, char * argv[] ) {
       std::cout << "Enter command to process (exit to quit): ";
       getline(std::cin, command);
       if(command == "exit") return 0;
-      std::cout << interpreter->process(command) << "\n";
+      std::cout << "Result of " << command << " is: " << interpreter->process(command) << "\n";
     } catch(std::string e) {
       std::cout << "An error occurred: " << e << std::endl;
     } catch(char const* e) {
