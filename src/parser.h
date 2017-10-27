@@ -3,11 +3,12 @@
 
 #include "globals.h"
 #include "ast.h"
+#include "visitor.h"
 #include "scan.h"
 #include <iostream>
 #include <string>
 
-class Interpreter {
+class Parser {
   Scan * scanner;
   TokenDetails * nextToken;
   void eat(TokenType::TOKENS tokenType);
@@ -16,12 +17,8 @@ class Interpreter {
   AST * term();
   AST * factor();
 
-  int visit(AST * node);
-  int visit(BinAST * node);
-  int visit(NumAST * node);
-
 public:
-  Interpreter() {}
+  Parser() {}
   virtual std::string process(std::string command);
 };
 

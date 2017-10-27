@@ -1,7 +1,7 @@
-#include "interpreter.h"
+#include "parser.h"
 #include <sstream>
 
-AST * Interpreter::factor() {
+AST * Parser::factor() {
   AST * node;
 
   switch(this->nextToken->type) {
@@ -21,7 +21,7 @@ AST * Interpreter::factor() {
   }
 }
 
-void Interpreter::eat(TokenType::TOKENS tokenType) {
+void Parser::eat(TokenType::TOKENS tokenType) {
   if(this->nextToken->type == tokenType) {
     this->nextToken = this->scanner->next();
   } else {
@@ -45,13 +45,13 @@ void Interpreter::eat(TokenType::TOKENS tokenType) {
   }
 }
 
-void Interpreter::error(std::string msg) {
+void Parser::error(std::string msg) {
   std::stringstream result;
   result << msg << this->nextToken->str << " at:" << this->nextToken->lineNumber << ":" << this->nextToken->startPosition;
   throw result.str();
 }
 
-AST * Interpreter::term() {
+AST * Parser::term() {
   AST * node;
   bool process = true;
   std::stringstream result;
@@ -78,7 +78,7 @@ AST * Interpreter::term() {
   return node;
 }
 
-AST * Interpreter::exp() {
+AST * Parser::exp() {
   AST * node;
   bool process = true;
   std::stringstream result;
@@ -105,7 +105,7 @@ AST * Interpreter::exp() {
 }
 
 
-std::string Interpreter::process(std::string command) {
+std::string Parser::process(std::string command) {
   std::stringstream result;
 
   this->scanner = new Scan(command);
@@ -116,30 +116,9 @@ std::string Interpreter::process(std::string command) {
 
   this->eat(TokenType::ENDFILE);
 
-  result << this->visit(node);
+  Visiter v;
+  node->accept(v);
+  result << v.value();
   return result.str();
 }
 
-int Interpreter::visit(AST * node) {
-  std::cout << "Failed" << std::endl;
-  return 0;
-}
-
-int Interpreter::visit(BinAST * node) {
-  switch(node->op) {
-  case TokenType::PLUS:
-    return this->visit(node->left) + this->visit(node->right);
-  case TokenType::MINUS:
-    return this->visit(node->left) - this->visit(node->right);
-  case TokenType::TIMES:
-    return this->visit(node->left) * this->visit(node->right);
-  case TokenType::DIVIDE:
-    return this->visit(node->left) / this->visit(node->right);
-  default:
-    throw "Umnexpected";
-  }
-}
-
-int Interpreter::visit(NumAST * node) {
-  return node->value;
-}
