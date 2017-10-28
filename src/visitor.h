@@ -4,42 +4,47 @@
 #include "globals.h"
 #include <sstream>
 #include <stack>
+#include <map>
 
 class Visiter {
-  std::stack<int> values;
+  std::stack<int> stack;
+  std::map<std::string, int> memory;
+  bool exit = false;
 
 public:
   int value() {
-    if(this->values.size() == 1) {
-      return this->values.top();
+    if(this->stack.size() == 1) {
+      return this->stack.top();
     } else {
       std::stringstream result;
-      result << "Elements left on the stack: " << this->values.size();
+      result << "Elements left on the stack: " << this->stack.size();
       throw  result.str();
     }
   }
 
   void visit(BinAST * node) {
+    if(this->exit) return;
     node->left->accept(*this);
+    if(this->exit) return;
     node->right->accept(*this);
 
-    int right = this->values.top();
-    this->values.pop();
-    int left = this->values.top();
-    this->values.pop();
+    int right = this->stack.top();
+    this->stack.pop();
+    int left = this->stack.top();
+    this->stack.pop();
 
     switch(node->op) {
     case TokenType::PLUS:
-      this->values.push(left + right);
+      this->stack.push(left + right);
       break;
     case TokenType::MINUS:
-      this->values.push(left - right);
+      this->stack.push(left - right);
       break;
     case TokenType::TIMES:
-      this->values.push(left * right);
+      this->stack.push(left * right);
       break;
     case TokenType::DIVIDE:
-      this->values.push(left / right);
+      this->stack.push(left / right);
       break;
     default:
       std::stringstream result;
@@ -49,7 +54,44 @@ public:
   }
 
   void visit(NumAST * node) {
-    this->values.push(node->value);
+    this->stack.push(node->value);
+  }
+
+  void visit(UniaryAST * node) {
+    if(this->exit) return;
+    node->node->accept(*this);
+
+    if(node->op == TokenType::MINUS) {
+      int value = this->stack.top();
+      this->stack.pop();
+      this->stack.push(-1 * value);
+    }
+  }
+
+  void visit(ListAST * node) {
+    for(AST * n : node->statements) {
+      if(this->exit) return;
+      n->accept(*this);
+    }
+  }
+
+  void visit(AssignAST * node) {
+    if(this->exit) return;
+    node->value->accept(*this);
+
+    this->memory[node->id] = this->stack.top();
+    this->stack.pop();
+  }
+
+  void visit(ReturnAST * node) {
+    if(this->exit) return;
+    node->value->accept(*this);
+    this->exit = true;
+    // TODO: need to break out of the call chain
+  }
+
+  void visit(VarAST * node) {
+    this->stack.push(this->memory[node->id]);
   }
 };
 

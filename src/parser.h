@@ -11,8 +11,13 @@
 class Parser {
   Scan * scanner;
   TokenDetails * nextToken;
+  void eat();
   void eat(TokenType::TOKENS tokenType);
   void error(std::string msg);
+  AST * assignmentStatement();
+  AST * returnStatement();
+  AST * statementList();
+  AST * statement();
   AST * exp();
   AST * term();
   AST * factor();

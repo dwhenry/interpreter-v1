@@ -5,13 +5,24 @@ AST * Parser::factor() {
   AST * node;
 
   switch(this->nextToken->type) {
+  case TokenType::PLUS:
+    // this can be ignored as it doesn't do anything
+    this->eat();
+    return this->factor();
+  case TokenType::MINUS:
+    this->eat();
+    return new UniaryAST(this->factor(), TokenType::MINUS);
   case TokenType::NUM:
     int value;
     std::stringstream(this->nextToken->str) >> value;
-    this->eat(TokenType::NUM);
+    this->eat();
     return new NumAST(value);
+  case TokenType::ID:
+    node = new VarAST(this->nextToken->str);
+    this->eat();
+    return node;
   case TokenType::L_BR:
-    this->eat(TokenType::L_BR);
+    this->eat();
     node = this->exp();
     this->eat(TokenType::R_BR);
     return node;
@@ -19,6 +30,10 @@ AST * Parser::factor() {
     this->error("Invalid token: ");
     return NULL;
   }
+}
+
+void Parser::eat() {
+  this->nextToken = this->scanner->next();
 }
 
 void Parser::eat(TokenType::TOKENS tokenType) {
@@ -62,11 +77,11 @@ AST * Parser::term() {
 
     switch(this->nextToken->type) {
     case TokenType::TIMES:
-      this->eat(TokenType::TIMES);
+      this->eat();
       node = new BinAST(node, TokenType::TIMES, this->factor());
       break;
     case TokenType::DIVIDE:
-      this->eat(TokenType::DIVIDE);
+      this->eat();
       node = new BinAST(node, TokenType::DIVIDE, this->factor());
       break;
     default:
@@ -79,31 +94,66 @@ AST * Parser::term() {
 }
 
 AST * Parser::exp() {
-  AST * node;
-  bool process = true;
-  std::stringstream result;
+  AST * node = this->term();
 
-  node = this->term();
-
-  while(process) {
+  while(true) {
     switch(this->nextToken->type) {
     case TokenType::PLUS:
-      this->eat(TokenType::PLUS);
+      this->eat();
       node = new BinAST(node, TokenType::PLUS, this->term());
       break;
     case TokenType::MINUS:
-      this->eat(TokenType::MINUS);
+      this->eat();
       node = new BinAST(node, TokenType::MINUS, this->term());
       break;
     default:
-      process = false;
+      return node;
+    };
+  }
+}
+
+AST * Parser::assignmentStatement() {
+  std::string tokenStr = this->nextToken->str;
+  this->eat();
+  this->eat(TokenType::ASSIGN);
+  return new AssignAST(tokenStr, this->exp());
+}
+
+AST * Parser::returnStatement() {
+  this->eat();
+  return new ReturnAST(this->exp());
+}
+
+AST * Parser::statement() {
+  switch(this->nextToken->type) {
+  case TokenType::ID:
+    return this->assignmentStatement();
+    break;
+  case TokenType::RETURN:
+    return this->returnStatement();
+    break;
+  default:
+    return NULL;
+  }
+}
+
+AST * Parser::statementList() {
+  ListAST * list = new ListAST();
+
+  list->add(this->statement());
+
+  while(true) {
+    switch(this->nextToken->type) {
+    case TokenType::SEMI:
+      this->eat();
+      list->add(this->statement());
       break;
+    default:
+      return list;
     };
   }
 
-  return node;
 }
-
 
 std::string Parser::process(std::string command) {
   std::stringstream result;
@@ -112,7 +162,7 @@ std::string Parser::process(std::string command) {
   this->nextToken = this->scanner->next();
   AST * node;
 
-  node = this->exp();
+  node = this->statementList();
 
   this->eat(TokenType::ENDFILE);
 
