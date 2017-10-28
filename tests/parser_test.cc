@@ -70,6 +70,17 @@ TEST_CASE("Simple parser", "[int]") {
       return a;
       return 3 + a
     )") == "3" );
+    CHECK( parser->process(R"(
+      a = 3;
+      b = 5;
+      a
+    )") == "3" );
+    CHECK( parser->process(R"(
+      a = 3;
+      b = 5;
+      a;
+      b
+    )") == "5" );
     CHECK_THROWS_WITH(
       parser->process("return b"),
       Catch::Contains("Uninitialised variable: b")

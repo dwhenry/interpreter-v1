@@ -115,8 +115,12 @@ AST * Parser::exp() {
 AST * Parser::assignmentStatement() {
   std::string tokenStr = this->nextToken->str;
   this->eat();
-  this->eat(TokenType::ASSIGN);
-  return new AssignAST(tokenStr, this->exp());
+  if(this->nextToken->type == TokenType::ASSIGN) {
+    this->eat();
+    return new AssignAST(tokenStr, this->exp());
+  } else {
+    return new VarAST(tokenStr);
+  }
 }
 
 AST * Parser::returnStatement() {

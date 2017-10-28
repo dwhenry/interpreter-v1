@@ -10,16 +10,11 @@ class Visiter {
   std::stack<int> stack;
   std::map<std::string, int> memory;
   bool exit = false;
+  int lastValue;
 
 public:
   int value() {
-    if(this->stack.size() == 1) {
-      return this->stack.top();
-    } else {
-      std::stringstream result;
-      result << "Elements left on the stack: " << this->stack.size();
-      throw  result.str();
-    }
+    return lastValue;
   }
 
   void visit(BinAST * node) {
@@ -72,6 +67,14 @@ public:
     for(AST * n : node->statements) {
       if(this->exit) return;
       n->accept(*this);
+      if(this->stack.size() == 1) {
+        this->lastValue = this->stack.top();
+        this->stack.pop();
+      } else if(this->stack.size() > 1) {
+        std::stringstream result;
+        result << "Elements left on the stack: " << this->stack.size();
+        throw result.str();
+      }
     }
   }
 
