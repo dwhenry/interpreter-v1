@@ -70,5 +70,9 @@ TEST_CASE("Simple parser", "[int]") {
       return a;
       return 3 + a
     )") == "3" );
+    CHECK_THROWS_WITH(
+      parser->process("return b"),
+      Catch::Contains("Uninitialised variable: b")
+    );
   }
 }

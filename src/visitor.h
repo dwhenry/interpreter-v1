@@ -48,7 +48,7 @@ public:
       break;
     default:
       std::stringstream result;
-      result << "Umnexpected operation: " << node->op << "valid '+' = " << TokenType::PLUS;
+      result << "Unexpected operation: " << node->op << "valid '+' = " << TokenType::PLUS;
       throw result.str();
     }
   }
@@ -91,6 +91,11 @@ public:
   }
 
   void visit(VarAST * node) {
+    if(this->memory.count(node->id) == 0) {
+      std::stringstream result;
+      result << "Uninitialised variable: " << node->id;
+      throw result.str();
+    }
     this->stack.push(this->memory[node->id]);
   }
 };
