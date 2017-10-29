@@ -8,7 +8,7 @@ namespace TokenType {
     /* book-keeping tokens */
     ENDFILE, //ERROR,
     /* reserved words */
-    IF, ELSE, INT, RETURN, VOID, WHILE,
+    DEF, IF, ELSE, END, RETURN, WHILE,
     /* multicharacter tokens */
     ID,NUM,
     /* special symbols */
@@ -23,6 +23,7 @@ typedef struct tokenDetails {
   std::string str;
   int lineNumber;
   int startPosition;
+  bool newLine;
 } TokenDetails;
 
 #define TOKENS_MAPS 19
@@ -53,6 +54,21 @@ static struct
       {']', '\0', TokenType::R_SQUARE_BR},
       {'{', '\0', TokenType::L_SQUIGGLE_BR},
       {'}', '\0', TokenType::R_SQUIGGLE_BR}
+    };
+
+#define RESERVED_MAPS 6
+static struct
+  {
+    std::string str;
+    TokenType::TOKENS token;
+  } reservedMap[RESERVED_MAPS]
+  = {
+      {"def", TokenType::DEF},
+      {"if", TokenType::IF},
+      {"else", TokenType::ELSE},
+      {"end", TokenType::END},
+      {"return", TokenType::RETURN},
+      {"while", TokenType::WHILE},
     };
 
 #define MAX_TOKEN_LENGTH 40

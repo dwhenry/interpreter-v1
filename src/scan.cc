@@ -1,19 +1,7 @@
 #include "globals.h"
 #include "scan.h"
-
-static struct
-  {
-    std::string str;
-    TokenType::TOKENS token;
-  } reservedMap[RESERVED_MAPS]
-  = {
-      {"if", TokenType::IF},
-      {"else", TokenType::ELSE},
-      {"int", TokenType::INT},
-      {"return", TokenType::RETURN},
-      {"void", TokenType::VOID},
-      {"while", TokenType::WHILE},
-    };
+#include <sstream>
+#include "log.h"
 
 void Scan::consumeComment() {
   int c;
@@ -72,7 +60,7 @@ TokenDetails * Scan::next() {
   char tokenString[MAX_TOKEN_LENGTH];
 
   TokenDetails * token = new TokenDetails();
-
+  token->newLine = false;
 
   // consume comments and spacing
   if(!consumeIgnorables()) {
@@ -112,9 +100,12 @@ TokenDetails * Scan::next() {
   }
 
   token->str = tokenString;
+  token->newLine = this->currentLine != token->lineNumber;
+  this->currentLine = token->lineNumber;
   return token;
 };
 
 Scan::Scan(std::string command) {
+  currentLine = 0;
   this->sourceFile = new SourceFile(command);
 };

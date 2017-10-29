@@ -7,13 +7,13 @@ all: main app_test
 ast.o: src/ast.cc src/ast.h src/visitor.h
 	g++ $(CFLAGS) -g -c src/ast.cc
 
-scan.o: src/scan.h src/scan.cc source_file.o
+scan.o: src/scan.h src/scan.cc source_file.o src/log.h
 	g++ $(CFLAGS) -g -c src/scan.cc
 
-source_file.o: src/source_file.cc src/source_file.h src/globals.h
+source_file.o: src/source_file.cc src/source_file.h src/globals.h src/log.h
 	g++ $(CFLAGS) -g -c src/source_file.cc
 
-parser.o: src/parser.cc scan.o ast.o
+parser.o: src/parser.cc scan.o ast.o src/log.h
 	g++ $(CFLAGS) -g -c src/parser.cc
 
 main.o: src/main.cc parser.o

@@ -7,7 +7,7 @@ BinAST::BinAST(AST * left, TokenType::TOKENS op, AST * right) {
   this->op = op;
   this->right = right;
 }
-void BinAST::accept(Visiter &i)
+void BinAST::accept(Visitor &i)
 {
   i.visit(this);
 }
@@ -15,7 +15,7 @@ void BinAST::accept(Visiter &i)
 NumAST::NumAST(int value) {
   this->value = value;
 }
-void NumAST::accept(Visiter &i)
+void NumAST::accept(Visitor &i)
 {
   i.visit(this);
 }
@@ -24,7 +24,7 @@ UniaryAST::UniaryAST(AST * node, TokenType::TOKENS op) {
   this->op = op;
   this->node = node;
 }
-void UniaryAST::accept(Visiter &i)
+void UniaryAST::accept(Visitor &i)
 {
   i.visit(this);
 }
@@ -35,7 +35,7 @@ void ListAST::add(AST * node) {
     statements.push_back(node);
   }
 }
-void ListAST::accept(class Visiter &i) {
+void ListAST::accept(class Visitor &i) {
   i.visit(this);
 }
 
@@ -43,21 +43,39 @@ AssignAST::AssignAST(std::string id, AST * value) {
   this->id = id;
   this->value = value;
 }
-void AssignAST::accept(class Visiter &i) {
+void AssignAST::accept(class Visitor &i) {
   i.visit(this);
 }
 
 ReturnAST::ReturnAST(AST * value) {
   this->value = value;
 }
-void ReturnAST::accept(class Visiter &i) {
+void ReturnAST::accept(class Visitor &i) {
   i.visit(this);
 }
 
 VarAST::VarAST(std::string id) {
   this->id = id;
 }
-void VarAST::accept(class Visiter &i) {
+void VarAST::accept(class Visitor &i) {
+  i.visit(this);
+}
+
+ConditionAST::ConditionAST(AST * cond, AST * trueBranch, AST * falseBranch) {
+  this->cond = cond;
+  this->trueBranch = trueBranch;
+  this->falseBranch = falseBranch;
+}
+void ConditionAST::accept(class Visitor &i) {
+  i.visit(this);
+}
+
+MethodAST::MethodAST(std::string name, AST * statementList) {
+  this->name = name;
+  this->statementList = statementList;
+}
+
+void MethodAST::accept(class Visitor &i) {
   i.visit(this);
 }
 

@@ -4,14 +4,12 @@
 #include "globals.h"
 #include "source_file.h"
 
-#define TOKENS_MAPS 19
-#define RESERVED_MAPS 6
-
 typedef int (*checkFunction)(int);
 
 class Scan {
   enum STATES { START, DONE, IS_NUMBER, IS_WORD, IS_COMMENT };
 
+  int currentLine;
   SourceFile * sourceFile;
   TokenType::TOKENS lookup(std::string tokenString);
   void consumeComment();

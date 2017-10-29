@@ -7,6 +7,7 @@
 #include "scan.h"
 #include <iostream>
 #include <string>
+#include "log.h"
 
 class Parser {
   Scan * scanner;
@@ -14,6 +15,8 @@ class Parser {
   void eat();
   void eat(TokenType::TOKENS tokenType);
   void error(std::string msg);
+  AST * defStatement();
+  AST * ifStatement();
   AST * assignmentStatement();
   AST * returnStatement();
   AST * statementList();
@@ -23,7 +26,7 @@ class Parser {
   AST * factor();
 
 public:
-  Parser() {}
+  Parser() {};
   virtual std::string process(std::string command);
 };
 

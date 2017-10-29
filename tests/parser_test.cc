@@ -12,6 +12,7 @@ TEST_CASE("Simple parser", "[int]") {
       parser->process("return 1 1"),
       Catch::Contains( "Expected 'EOF' got: 1" )
     );
+    CHECK( parser->process("12 +24") == "36" );
   }
 
   SECTION("Negation") {
@@ -81,9 +82,63 @@ TEST_CASE("Simple parser", "[int]") {
       a;
       b
     )") == "5" );
+    CHECK( parser->process(R"(
+      a = 3;
+      a + 3;
+    )") == "6" );
+    CHECK( parser->process(R"(
+      a = 3;
+      a = a + 3;
+    )") == "6" );
     CHECK_THROWS_WITH(
       parser->process("return b"),
       Catch::Contains("Uninitialised variable: b")
     );
+  }
+
+  SECTION("if conditional") {
+    CHECK( parser->process(R"(
+      if 1
+        3
+      else
+        5
+      end
+    )") == "3" );
+    CHECK( parser->process(R"(
+      if 0
+        3
+      else
+        5
+      end
+    )") == "5" );
+  }
+
+  SECTION("Methods") {
+    CHECK( parser->process(R"(
+      def a
+        3
+      end
+      5
+    )") == "5" );
+    CHECK( parser->process(R"(
+      def a
+        3
+      end
+      5
+      a
+    )") == "3" );
+    CHECK( parser->process(R"(
+      def a
+        return 3
+      end
+      5
+    )") == "5" );
+    CHECK( parser->process(R"(
+      b = 5
+      def a
+        b = 10
+      end
+      b
+    )") == "5" );
   }
 }

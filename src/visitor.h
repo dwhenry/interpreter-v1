@@ -6,9 +6,10 @@
 #include <stack>
 #include <map>
 
-class Visiter {
+class Visitor {
   std::stack<int> stack;
   std::map<std::string, int> memory;
+  std::map<std::string, AST *> methods;
   bool exit = false;
   int lastValue;
 
@@ -94,12 +95,36 @@ public:
   }
 
   void visit(VarAST * node) {
-    if(this->memory.count(node->id) == 0) {
+    if(this->memory.count(node->id) != 0) {
+      this->stack.push(this->memory[node->id]);
+    } else if(this->methods.count(node->id) != 0) {
+      Visitor methodVisitor;
+      this->methods[node->id]->accept(methodVisitor);
+      this->stack.push(methodVisitor.value());
+    } else {
       std::stringstream result;
       result << "Uninitialised variable: " << node->id;
       throw result.str();
     }
-    this->stack.push(this->memory[node->id]);
+  }
+
+  void visit(ConditionAST * node) {
+    if(this->exit) return;
+    node->cond->accept(*this);
+    int check = this->stack.top();
+    this->stack.pop();
+
+    if(this->exit) return;
+    if(check > 0) {
+      node->trueBranch->accept(*this);
+    } else if(node->falseBranch != NULL) {
+      node->falseBranch->accept(*this);
+    }
+  }
+
+  void visit(MethodAST * node) {
+    if(this->exit) return;
+    this->methods[node->name] = node->statementList;
   }
 };
 

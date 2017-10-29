@@ -4,10 +4,11 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <queue>
 
 class SourceFile {
 private:
-  std::string command;
+  std::queue<std::string> commands;
   std::string currentLine;
 public:
   int lineNumber;
